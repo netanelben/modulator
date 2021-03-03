@@ -1,10 +1,10 @@
 const doReset = true
 const FILL = '#000'
 const movementA = 60;
-const numOfObjects = 3;
+const numOfObjects = 1;
 
-const GRAD_1 = "#483ffb"
-const GRAD_2 = "#e95858"
+const GRAD_1 = "#7afc46"
+const GRAD_2 = "#7afc46"
 const GRAD_3 = "#7afc46"
 
 const logMsgs = [];
@@ -30,7 +30,7 @@ const MakeItHappen = (idx) => {
 
         init() {
             for (let i = 0; i < 512; ++i) {
-                this.p[i] = Math.random() * 56;
+                this.p[i] = Math.random() * 33;
             }
         }
 
@@ -67,9 +67,9 @@ const MakeItHappen = (idx) => {
         }
 
         noise(x, y) {
-            let e = 1,
-                k = 1,
-                s = 0;
+            let e = 1;
+            let k = 1;
+            let s = 0;
 
             for (let i = 0; i < this.octaves; ++i) {
                 e *= 0.5;
@@ -89,19 +89,15 @@ const MakeItHappen = (idx) => {
             this.a = a;
         }
 
-        move() {
-            const n = perlin.noise(this.x * 0.01, this.y * 0.01);
+        move({ color, movement }) {
+            const noise = perlin.noise(this.x * movement, this.y * 0.01)
+            const n = movement * noise
             const a = this.a + n * movementA;
 
             this.x += Math.cos(a);
             this.y += Math.sin(a);
 
-            const gradient = ctx.createLinearGradient(0, 50, 50, 0);
-            gradient.addColorStop(0, GRAD_1);
-            gradient.addColorStop(0.5, GRAD_2);
-            gradient.addColorStop(1.0, GRAD_3);
-
-            ctx.fillStyle = gradient;
+            ctx.fillStyle = color;
             ctx.fillRect(this.x, this.y, 0.75, 0.75);
 
             if (
@@ -186,12 +182,6 @@ const MakeItHappen = (idx) => {
             // 'SISIUD'
             particles.add(new Particle(pointer.x, pointer.y, a));
             streamIdx++
-
-            // log({streamIdx})
-
-            if (streamIdx === 1441) {
-                console.log('im done')
-            }
         }
     };
 
@@ -200,14 +190,15 @@ const MakeItHappen = (idx) => {
         requestAnimationFrame(run);
 
         for (const p of particles) {
-            p.move();
+            // p.move({ color: 'red', movement: 1 });
+            p.move({ color: GRAD_1, movement: 2 });
+            // p.move({ color: GRAD_2, movement: 3 });
+            // p.move({ color: GRAD_3, movement: 4 });
         }
     };
 
     init()
     run()
-    // setTimeout(() => {
-    // }, 1000);
 }
 
 for (let i = 0; i < numOfObjects; i++) {
@@ -216,3 +207,14 @@ for (let i = 0; i < numOfObjects; i++) {
 
 // Based on the algo
 // http://mrl.nyu.edu/~perlin/noise/
+
+// creates grad pattern for fillStyle.
+const createGradient = () => {
+    const gradient = ctx.createLinearGradient(0, 10, 10, 0);
+
+    gradient.addColorStop(0, color);
+    gradient.addColorStop(0.5, GRAD_2);
+    gradient.addColorStop(1.0, GRAD_3);
+
+    return gradient;
+}
